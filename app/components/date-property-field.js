@@ -1,25 +1,22 @@
 import { scheduleOnce } from '@ember/runloop';
 import DatePicker from 'ember-inspector/components/ember-flatpickr';
+import { KEYS } from 'ember-inspector/utils/key-codes';
 
-const KEY_EVENTS = {
-  escape: 27
-};
-
-export default DatePicker.extend({
+export default class DatePropertyFieldComponent extends DatePicker {
   didInsertElement() {
-    this._super(...arguments);
+    super.didInsertElement(...arguments);
 
     scheduleOnce('afterRender', this, this._openFlatpickr);
-  },
+  }
 
   keyUp(e) {
-    if (e.keyCode === KEY_EVENTS.escape) {
+    if (e.keyCode === KEYS.escape) {
       this.flatpickrRef.close();
     }
-    return this._super(...arguments);
-  },
+    return super.keyUp(...arguments);
+  }
 
   _openFlatpickr() {
     this.flatpickrRef.open();
   }
-});
+}
