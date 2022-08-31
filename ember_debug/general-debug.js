@@ -1,8 +1,7 @@
 /* eslint no-empty:0 */
-import PortMixin from "ember-debug/mixins/port-mixin";
-const Ember = window.Ember;
-const { Object: EmberObject } = Ember;
-let { libraries } = Ember;
+import DebugPort from './debug-port';
+
+import Ember from 'ember-debug/utils/ember';
 
 /**
  * Class that handles gathering general information of the inspected app.
@@ -13,7 +12,7 @@ let { libraries } = Ember;
  *
  * @module ember-debug/general-debug
  */
-export default EmberObject.extend(PortMixin, {
+export default DebugPort.extend({
   /**
    * Fetches the ember-cli configuration info and sets them on
    * the `emberCliConfig` property.
@@ -37,7 +36,7 @@ export default EmberObject.extend(PortMixin, {
   namespace: null,
 
   /**
-   * Used by the PortMixin
+   * Used by the DebugPort
    *
    * @type {String}
    */
@@ -66,7 +65,7 @@ export default EmberObject.extend(PortMixin, {
    */
   sendBooted() {
     this.sendMessage('applicationBooted', {
-      booted: this.get('namespace.owner.__inspector__booted')
+      booted: this.get('namespace.owner.__inspector__booted'),
     });
   },
 
@@ -91,7 +90,13 @@ export default EmberObject.extend(PortMixin, {
      * the info tab.
      */
     getLibraries() {
-      this.sendMessage('libraries', { libraries: libraries._registry });
+      this.sendMessage('libraries', { libraries: Ember.libraries._registry });
+    },
+
+    getEmberCliConfig() {
+      this.sendMessage('emberCliConfig', {
+        emberCliConfig: this.emberCliConfig,
+      });
     },
 
     /**
@@ -101,8 +106,8 @@ export default EmberObject.extend(PortMixin, {
      */
     refresh() {
       window.location.reload();
-    }
-  }
+    },
+  },
 });
 
 /**

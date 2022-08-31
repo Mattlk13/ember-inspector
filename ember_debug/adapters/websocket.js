@@ -1,20 +1,21 @@
-import BasicAdapter from "./basic";
-const Ember = window.Ember;
-const { computed, run, RSVP: { Promise } } = Ember;
-import { onReady } from '../utils/on-ready';
+import BasicAdapter from './basic';
+import { onReady } from 'ember-debug/utils/on-ready';
+
+import { computed } from 'ember-debug/utils/ember/object';
+import { run } from 'ember-debug/utils/ember/runloop';
+import { Promise } from 'ember-debug/utils/rsvp';
 
 export default BasicAdapter.extend({
-
   sendMessage(options = {}) {
-    this.get('socket').emit('emberInspectorMessage', options);
+    this.socket.emit('emberInspectorMessage', options);
   },
 
-  socket: computed(function() {
+  socket: computed(function () {
     return window.EMBER_INSPECTOR_CONFIG.remoteDebugSocket;
   }),
 
   _listen() {
-    this.get('socket').on('emberInspectorMessage', message => {
+    this.socket.on('emberInspectorMessage', (message) => {
       // We should generally not be run-wrapping here. Starting a runloop in
       // ember-debug will cause the inspected app to revalidate/rerender. We
       // are generally not intending to cause changes to the rendered output
@@ -37,15 +38,20 @@ export default BasicAdapter.extend({
   },
 
   _disconnect() {
-    this.get('socket').removeAllListeners("emberInspectorMessage");
+    this.socket.removeAllListeners('emberInspectorMessage');
   },
 
   connect() {
     return new Promise((resolve, reject) => {
       onReady(() => {
-        if (this.isDestroyed) { reject(); }
+        if (this.isDestroyed) {
+          reject();
+        }
         const EMBER_INSPECTOR_CONFIG = window.EMBER_INSPECTOR_CONFIG;
-        if (typeof EMBER_INSPECTOR_CONFIG === 'object' && EMBER_INSPECTOR_CONFIG.remoteDebugSocket) {
+        if (
+          typeof EMBER_INSPECTOR_CONFIG === 'object' &&
+          EMBER_INSPECTOR_CONFIG.remoteDebugSocket
+        ) {
           resolve();
         }
       });
@@ -56,5 +62,5 @@ export default BasicAdapter.extend({
 
   willDestroy() {
     this._disconnect();
-  }
+  },
 });

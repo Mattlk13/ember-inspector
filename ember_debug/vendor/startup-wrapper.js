@@ -1,3 +1,5 @@
+let Ember;
+
 /* eslint camelcase:0 */
 /**
  This is a wrapper for `ember-debug.js`
@@ -9,7 +11,7 @@
  Also responsible for sending the first tree.
  **/
 /*eslint prefer-spread: 0 */
-/* globals Ember, adapter, env, requireModule */
+/* globals adapter, env */
 var currentAdapter = 'basic';
 if (typeof adapter !== 'undefined') {
   currentAdapter = adapter;
@@ -30,13 +32,19 @@ var EMBER_VERSIONS_SUPPORTED = {{EMBER_VERSIONS_SUPPORTED}};
       return;
     }
 
+    // If Ember doesn't exist, we should stop here to avoid issues with accessing `Ember.VERSION`
+    if (!Ember) {
+      return;
+    }
+
     if (!versionTest(Ember.VERSION, EMBER_VERSIONS_SUPPORTED)) {
       // Wrong inspector version. Redirect to the correct version.
       sendVersionMiss();
       return;
     }
+    
     // prevent from injecting twice
-    if (!Ember.EmberInspectorDebugger) {
+    if (!window.EmberInspector) {
       // Make sure we only work for the supported version
       define('ember-debug/config', function() {
         return {
@@ -45,8 +53,13 @@ var EMBER_VERSIONS_SUPPORTED = {{EMBER_VERSIONS_SUPPORTED}};
           }
         };
       });
-      window.EmberInspector = Ember.EmberInspectorDebugger = requireModule('ember-debug/main')['default'];
-      Ember.EmberInspectorDebugger.Adapter = requireModule('ember-debug/adapters/' + adapter)['default'];
+      
+      let emberDebugMainModule = requireModule('ember-debug/main');
+      if (!emberDebugMainModule['default']) {
+        return;
+      }
+      window.EmberInspector = emberDebugMainModule['default'];
+      window.EmberInspector.Adapter = requireModule('ember-debug/adapters/' + adapter)['default'];
 
       onApplicationStart(function appStarted(instance) {
         let app = instance.application;
@@ -64,16 +77,16 @@ var EMBER_VERSIONS_SUPPORTED = {{EMBER_VERSIONS_SUPPORTED}};
           instance.reopen({
             // Clean up on instance destruction
             willDestroy() {
-              if (Ember.EmberInspectorDebugger.get('owner') === instance) {
-                Ember.EmberInspectorDebugger.destroyContainer();
-                Ember.EmberInspectorDebugger.clear();
+              if (window.EmberInspector.get('owner') === instance) {
+                window.EmberInspector.destroyContainer();
+                window.EmberInspector.clear();
               }
               return this._super.apply(this, arguments);
             }
           });
 
-          if (!Ember.EmberInspectorDebugger._application) {
-            bootEmberInspector(instance);
+          if (!window.EmberInspector._application) {
+            setTimeout(() => bootEmberInspector(instance), 0);
           }
         }
       });
@@ -85,9 +98,9 @@ var EMBER_VERSIONS_SUPPORTED = {{EMBER_VERSIONS_SUPPORTED}};
     appInstance.__inspector__booted = true;
 
     // Boot the inspector (or re-boot if already booted, for example in tests)
-    Ember.EmberInspectorDebugger.set('_application', appInstance.application);
-    Ember.EmberInspectorDebugger.set('owner', appInstance);
-    Ember.EmberInspectorDebugger.start(true);
+    window.EmberInspector.set('_application', appInstance.application);
+    window.EmberInspector.set('owner', appInstance);
+    window.EmberInspector.start(true);
   }
 
   function onEmberReady(callback) {
@@ -96,12 +109,21 @@ var EMBER_VERSIONS_SUPPORTED = {{EMBER_VERSIONS_SUPPORTED}};
       if (triggered) {
         return;
       }
-      if (!window.Ember) {
+
+      if (!Ember) {
+        try {
+          Ember = requireModule('ember')['default'];
+        } catch {
+          Ember = window.Ember;
+        }
+      }
+
+      if (!Ember) {
         return;
       }
       // `Ember.Application` load hook triggers before all of Ember is ready.
       // In this case we ignore and wait for the `Ember` load hook.
-      if (!window.Ember.RSVP) {
+      if (!Ember.RSVP) {
         return;
       }
       triggered = true;
@@ -109,15 +131,9 @@ var EMBER_VERSIONS_SUPPORTED = {{EMBER_VERSIONS_SUPPORTED}};
     };
 
     // Newest Ember versions >= 1.10
-    window.addEventListener('Ember', triggerOnce, false);
-    // Old Ember versions
-    window.addEventListener('Ember.Application', function() {
-      if (window.Ember && window.Ember.VERSION && compareVersion(window.Ember.VERSION, '1.10.0') === 1) {
-        // Ember >= 1.10 should be handled by `Ember` load hook instead.
-        return;
-      }
-      triggerOnce();
-    }, false);
+   
+    const later = () => setTimeout(triggerOnce, 0);
+    window.addEventListener('Ember', later, { once: true });
     // Oldest Ember versions or if this was injected after Ember has loaded.
     onReady(triggerOnce);
   }
@@ -138,7 +154,7 @@ var EMBER_VERSIONS_SUPPORTED = {{EMBER_VERSIONS_SUPPORTED}};
       }
 
       if (message.type === 'app-selected') {
-        let current = Ember.EmberInspectorDebugger._application;
+        let current = window.EmberInspector._application;
         let selected = getApplications().find(app => Ember.guidFor(app) === message.applicationId);
 
         if (current !== selected && selected.__deprecatedInstance__) {
@@ -151,20 +167,41 @@ var EMBER_VERSIONS_SUPPORTED = {{EMBER_VERSIONS_SUPPORTED}};
 
     sendApps(adapterInstance, apps);
 
+    function loadInstance(app) {
+      let instance = app.__deprecatedInstance__ || (app._applicationInstances && app._applicationInstances[0]);
+      if (instance) {
+        // App started
+        setupInstanceInitializer(app, callback);
+        callback(instance);
+        return true
+      }
+    }
+
     var app;
     for (var i = 0, l = apps.length; i < l; i++) {
       app = apps[i];
       // We check for the existance of an application instance because
       // in Ember > 3 tests don't destroy the app when they're done but the app has no booted instances.
       if (app._readinessDeferrals === 0) {
-        let instance = app.__deprecatedInstance__ || (app._applicationInstances && app._applicationInstances[0]);
-        if (instance) {
-          // App started
-          setupInstanceInitializer(app, callback);
-          callback(instance);
+        if (loadInstance(app)) {
           break;
         }
       }
+
+      // app already run initializers, but no instance, use _bootPromise and didBecomeReady
+      if(app._bootPromise) {
+        app._bootPromise.then((app) => {
+          loadInstance(app);
+        });
+      }
+
+      app.reopen({
+        didBecomeReady() {
+          this._super.apply(this, arguments);
+          setTimeout(() => loadInstance(app), 0)
+        }
+      });
+
     }
     Ember.Application.initializer({
       name: 'ember-inspector-booted',

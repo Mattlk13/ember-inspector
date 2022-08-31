@@ -1,8 +1,9 @@
 import BasicAdapter from './basic';
-import { typeOf } from '../utils/type-check';
+import { typeOf } from 'ember-debug/utils/type-check';
 
-const Ember = window.Ember;
-const { run } = Ember;
+import Ember from 'ember-debug/utils/ember';
+import { run } from 'ember-debug/utils/ember/runloop';
+
 const { isArray } = Array;
 const { keys } = Object;
 
@@ -15,11 +16,15 @@ export default BasicAdapter.extend({
   },
 
   connect() {
-    const channel = this.get('_channel');
-    return this._super(...arguments).then(() => {
-      window.postMessage('debugger-client', '*', [channel.port2]);
-      this._listen();
-    }, null, 'ember-inspector');
+    const channel = this._channel;
+    return this._super(...arguments).then(
+      () => {
+        window.postMessage('debugger-client', '*', [channel.port2]);
+        this._listen();
+      },
+      null,
+      'ember-inspector'
+    );
   },
 
   sendMessage(options = {}) {
@@ -28,7 +33,7 @@ export default BasicAdapter.extend({
     // "clone" them through postMessage unless they are converted to a
     // native array.
     options = deepClone(options);
-    this.get('_chromePort').postMessage(options);
+    this._chromePort.postMessage(options);
   },
 
   /**
@@ -44,7 +49,7 @@ export default BasicAdapter.extend({
     // scope but not on the global object (i.e. `window.inspect`) does
     // not work. This sometimes causes problems, because, e.g. if the
     // page has a div with the ID `inspect`, `window.inspect` will point
-    // to that div and shadown the "global" inspect function with no way
+    // to that div and shadow the "global" inspect function with no way
     // to get it back. That causes "`inspect` is not a function" errors.
     //
     // As it turns out, however, when the extension page evals, the
@@ -64,9 +69,9 @@ export default BasicAdapter.extend({
   },
 
   _listen() {
-    let chromePort = this.get('_chromePort');
+    let chromePort = this._chromePort;
 
-    chromePort.addEventListener('message', event => {
+    chromePort.addEventListener('message', (event) => {
       const message = event.data;
 
       // We should generally not be run-wrapping here. Starting a runloop in
@@ -90,7 +95,7 @@ export default BasicAdapter.extend({
     });
 
     chromePort.start();
-  }
+  },
 });
 
 // On some older Ember version `Ember.ENV.EXTEND_PROTOTYPES` is not
@@ -102,7 +107,7 @@ export default BasicAdapter.extend({
 const HAS_ARRAY_PROTOTYPE_EXTENSIONS = (() => {
   try {
     return Ember.ENV.EXTEND_PROTOTYPES.Array === true;
-  } catch(e) {
+  } catch (e) {
     return false;
   }
 })();
@@ -133,7 +138,7 @@ if (HAS_ARRAY_PROTOTYPE_EXTENSIONS) {
       });
     } else if (item && typeOf(item) === 'object') {
       clone = {};
-      keys(item).forEach(key => {
+      keys(item).forEach((key) => {
         clone[key] = deepClone(item[key]);
       });
     }

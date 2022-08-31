@@ -2,57 +2,46 @@ import { run, later } from '@ember/runloop';
 import { A as emberA } from '@ember/array';
 import RSVP from 'rsvp';
 import { module, skip, test } from 'qunit';
-import require from 'require';
-import { setupEIApp, destroyEIApp } from '../helpers/setup-destroy-ei-app';
 import { settled } from '@ember/test-helpers';
-
-const EmberDebug = require('ember-debug/main').default;
-
-let port, name, message;
-let App;
+import EmberDebug from 'ember-debug/main';
+import setupEmberDebugTest from '../helpers/setup-ember-debug-test';
+import Port from 'ember-debug/port';
 
 // RSVP instrumentation is out of band (50 ms delay)
 async function rsvpDelay() {
-  later(function() {}, 100);
+  later(function () {}, 100);
   await settled();
 }
 
-module('Ember Debug - Promise Debug', function(hooks) {
-  hooks.beforeEach(async function() {
+module('Ember Debug - Promise Debug', function (hooks) {
+  let name, message;
 
-    EmberDebug.Port = EmberDebug.Port.extend({
+  setupEmberDebugTest(hooks, {
+    Port: Port.extend({
       init() {},
       send(n, m) {
         name = n;
         message = m;
-      }
-    });
+      },
+    }),
+  });
 
-    App = await setupEIApp.call(this, EmberDebug);
-
+  hooks.beforeEach(async function () {
     EmberDebug.get('promiseDebug').reopen({
       delay: 5,
       session: {
         getItem() {},
         setItem() {},
-        removeItem() {}
-      }
+        removeItem() {},
+      },
     });
-    port = EmberDebug.port;
-  });
-
-  hooks.afterEach(async function() {
-    name = null;
-    message = null;
-    await destroyEIApp.call(this, EmberDebug, App);
   });
 
   test('Existing promises sent when requested', async function t(assert) {
     let promise1, child1, promise2;
 
-    run(function() {
-      RSVP.resolve('value', 'Promise1')
-        .then(function() {}, null, 'Child1');
+    run(() => {
+      RSVP.resolve('value', 'Promise1').then(function () {}, null, 'Child1');
 
       // catch so we don't get a promise failure
       RSVP.reject('reason', 'Promise2').catch(() => {});
@@ -60,9 +49,9 @@ module('Ember Debug - Promise Debug', function(hooks) {
 
     await rsvpDelay();
 
-    port.trigger('promise:getAndObservePromises');
+    EmberDebug.port.trigger('promise:getAndObservePromises');
 
-    assert.equal(name, 'promise:promisesUpdated');
+    assert.strictEqual(name, 'promise:promisesUpdated');
 
     let promises = emberA(message.promises);
 
@@ -70,55 +59,54 @@ module('Ember Debug - Promise Debug', function(hooks) {
     child1 = promises.findBy('label', 'Child1');
     promise2 = promises.findBy('label', 'Promise2');
 
-    assert.equal(promise1.label, 'Promise1');
-    assert.equal(promise1.state, 'fulfilled');
-    assert.equal(promise1.children.length, 1);
-    assert.equal(promise1.children[0], child1.guid);
+    assert.strictEqual(promise1.label, 'Promise1');
+    assert.strictEqual(promise1.state, 'fulfilled');
+    assert.strictEqual(promise1.children.length, 1);
+    assert.strictEqual(promise1.children[0], child1.guid);
 
-    assert.equal(child1.label, 'Child1');
-    assert.equal(child1.state, 'fulfilled');
-    assert.equal(child1.parent, promise1.guid);
+    assert.strictEqual(child1.label, 'Child1');
+    assert.strictEqual(child1.state, 'fulfilled');
+    assert.strictEqual(child1.parent, promise1.guid);
 
-    assert.equal(promise2.label, 'Promise2');
-    assert.equal(promise2.state, 'rejected');
-
-
+    assert.strictEqual(promise2.label, 'Promise2');
+    assert.strictEqual(promise2.state, 'rejected');
   });
 
-  test('Updates are published when they happen', function(assert) {
-    port.trigger('promise:getAndObservePromises');
+  test('Updates are published when they happen', function (assert) {
+    assert.expect(8);
+
+    EmberDebug.port.trigger('promise:getAndObservePromises');
 
     let p;
 
-    run(function() {
-      p = new RSVP.Promise(function() {}, 'Promise1');
+    run(function () {
+      p = new RSVP.Promise(function () {}, 'Promise1');
     });
 
     let done = assert.async();
-    later(function() {
-      assert.equal(name, 'promise:promisesUpdated');
+    later(function () {
+      assert.strictEqual(name, 'promise:promisesUpdated');
       let promises = emberA(message.promises);
       let promise = promises.findBy('label', 'Promise1');
       assert.ok(!!promise);
       if (promise) {
-        assert.equal(promise.label, 'Promise1');
-        p.then(function() {}, null, 'Child1');
-        later(function() {
-          assert.equal(name, 'promise:promisesUpdated');
-          assert.equal(message.promises.length, 2);
+        assert.strictEqual(promise.label, 'Promise1');
+        p.then(function () {}, null, 'Child1');
+        later(function () {
+          assert.strictEqual(name, 'promise:promisesUpdated');
+          assert.strictEqual(message.promises.length, 2);
           let child = message.promises[0];
-          assert.equal(child.parent, promise.guid);
-          assert.equal(child.label, 'Child1');
+          assert.strictEqual(child.parent, promise.guid);
+          assert.strictEqual(child.label, 'Child1');
           let parent = message.promises[1];
-          assert.equal(parent.guid, promise.guid);
+          assert.strictEqual(parent.guid, promise.guid);
           done();
         }, 200);
       }
     }, 200);
   });
 
-
-  test('Instrumentation with stack is persisted to session storage', async function(assert) {
+  test('Instrumentation with stack is persisted to session storage', async function (assert) {
     let withStack = false;
     EmberDebug.get('promiseDebug').reopen({
       session: {
@@ -127,39 +115,37 @@ module('Ember Debug - Promise Debug', function(hooks) {
         },
         setItem(key, val) {
           withStack = val;
-        }
-      }
+        },
+      },
     });
 
     await settled();
-    port.trigger('promise:getInstrumentWithStack');
-
-
-    await settled();
-    assert.equal(name, 'promise:instrumentWithStack');
-    assert.equal(message.instrumentWithStack, false);
-    port.trigger('promise:setInstrumentWithStack', {
-      instrumentWithStack: true
-    });
-
+    EmberDebug.port.trigger('promise:getInstrumentWithStack');
 
     await settled();
-    assert.equal(name, 'promise:instrumentWithStack');
-    assert.equal(message.instrumentWithStack, true);
-    assert.equal(withStack, true, 'persisted');
-    port.trigger('promise:setInstrumentWithStack', {
-      instrumentWithStack: false
+    assert.strictEqual(name, 'promise:instrumentWithStack');
+    assert.false(message.instrumentWithStack);
+    EmberDebug.port.trigger('promise:setInstrumentWithStack', {
+      instrumentWithStack: true,
     });
 
     await settled();
-    assert.equal(name, 'promise:instrumentWithStack');
-    assert.equal(message.instrumentWithStack, false);
-    assert.equal(withStack, false, 'persisted');
+    assert.strictEqual(name, 'promise:instrumentWithStack');
+    assert.true(message.instrumentWithStack);
+    assert.true(withStack, 'persisted');
+    EmberDebug.port.trigger('promise:setInstrumentWithStack', {
+      instrumentWithStack: false,
+    });
+
+    await settled();
+    assert.strictEqual(name, 'promise:instrumentWithStack');
+    assert.false(message.instrumentWithStack);
+    assert.false(withStack, 'persisted');
   });
 
-  skip('Responds even if no promises detected', function(assert) {
-    port.trigger('promise:getAndObservePromises');
-    assert.equal(name, 'promise:promisesUpdated');
-    assert.equal(message.promises.length, 0);
+  skip('Responds even if no promises detected', function (assert) {
+    EmberDebug.port.trigger('promise:getAndObservePromises');
+    assert.strictEqual(name, 'promise:promisesUpdated');
+    assert.strictEqual(message.promises.length, 0);
   });
 });

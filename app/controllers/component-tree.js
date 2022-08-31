@@ -2,10 +2,11 @@ import Controller, { inject as controller } from '@ember/controller';
 import { action } from '@ember/object';
 import { debounce } from '@ember/runloop';
 import { inject as service } from '@ember/service';
-import { htmlSafe } from '@ember/string';
+import { htmlSafe } from '@ember/template';
 import { tracked } from '@glimmer/tracking';
 
 import searchMatch from 'ember-inspector/utils/search-match';
+import { KEYS } from 'ember-inspector/utils/key-codes';
 
 export default class ComponentTreeController extends Controller {
   queryParams = ['pinned', 'previewing', 'query'];
@@ -33,7 +34,7 @@ export default class ComponentTreeController extends Controller {
 
     let flatten = (parent, renderNode) => {
       if (isInternalRenderNode(renderNode)) {
-        renderNode.children.forEach(node => flatten(parent, node));
+        renderNode.children.forEach((node) => flatten(parent, node));
       } else {
         let item = _store[renderNode.id];
 
@@ -47,11 +48,11 @@ export default class ComponentTreeController extends Controller {
 
         renderItems.push(item);
 
-        renderNode.children.forEach(node => flatten(item, node));
+        renderNode.children.forEach((node) => flatten(item, node));
       }
     };
 
-    renderTree.forEach(node => flatten(null, node));
+    renderTree.forEach((node) => flatten(null, node));
 
     this._store = store;
 
@@ -72,11 +73,25 @@ export default class ComponentTreeController extends Controller {
     }
   }
 
+  get nextItem() {
+    const items = this.visibleItems;
+    return (
+      items[items.indexOf(this.findItem(this.pinned)) + 1] ||
+      items[items.length - 1]
+    );
+  }
+
+  get previousItem() {
+    const items = this.visibleItems;
+    return items[items.indexOf(this.findItem(this.pinned)) - 1] || items[0];
+  }
+
   get matchingItems() {
     let { renderItems, query } = this;
 
     if (query) {
-      let match = item => searchMatch(item.name, query) || item.childItems.some(match);
+      let match = (item) =>
+        searchMatch(item.name, query) || item.childItems.some(match);
       renderItems = renderItems.filter(match);
     }
 
@@ -84,7 +99,7 @@ export default class ComponentTreeController extends Controller {
   }
 
   get visibleItems() {
-    return this.matchingItems.filter(item => item.isVisible);
+    return this.matchingItems.filter((item) => item.isVisible);
   }
 
   get pinned() {
@@ -105,7 +120,9 @@ export default class ComponentTreeController extends Controller {
       item.show();
 
       if (item.hasInstance) {
-        this.port.send('objectInspector:inspectById', { objectId: item.instance });
+        this.port.send('objectInspector:inspectById', {
+          objectId: item.instance,
+        });
       } else {
         this.application.hideInspector();
       }
@@ -162,8 +179,52 @@ export default class ComponentTreeController extends Controller {
   cancelSelection(id, pinned) {
     if (pinned && this.pinned === id) {
       this.pinned = undefined;
-    } else if (!pinned && (this.previewing === id || this.previewing === undefined)) {
+    } else if (
+      !pinned &&
+      (this.previewing === id || this.previewing === undefined)
+    ) {
       this.previewing = undefined;
+    }
+  }
+
+  @action handleKeyDown(event) {
+    if (focusedInInput()) {
+      return;
+    }
+
+    if (arrowKeyPressed(event.keyCode)) {
+      event.preventDefault();
+    }
+
+    switch (event.keyCode) {
+      case KEYS.up:
+        this.pinned = this.previousItem.id;
+        break;
+      case KEYS.right: {
+        const pinnedItem = this.findItem(this.pinned);
+
+        if (pinnedItem.isExpanded) {
+          this.pinned = this.nextItem.id;
+        } else {
+          pinnedItem.expand();
+        }
+
+        break;
+      }
+      case KEYS.down:
+        this.pinned = this.nextItem.id;
+        break;
+      case KEYS.left: {
+        const pinnedItem = this.findItem(this.pinned);
+
+        if (pinnedItem.isExpanded) {
+          pinnedItem.collapse();
+        } else {
+          this.pinned = pinnedItem.parentItem.id;
+        }
+
+        break;
+      }
     }
   }
 
@@ -172,26 +233,48 @@ export default class ComponentTreeController extends Controller {
   }
 
   @action expandAll() {
-    this.renderItems.forEach(item => item.expand());
+    this.renderItems.forEach((item) => item.expand());
   }
 
   @action collapseAll() {
-    this.renderItems.forEach(item => item.collapse());
+    this.renderItems.forEach((item) => item.collapse());
+  }
+
+  @action arrowKeysSetup() {
+    document.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  @action arrowKeysTeardown() {
+    document.removeEventListener('keydown', this.handleKeyDown);
   }
 }
 
 function isInternalRenderNode(renderNode) {
-  return renderNode.type === 'outlet' && renderNode.name === 'main' ||
-    renderNode.type === 'route-template' && renderNode.name === '-top-level';
+  return (
+    (renderNode.type === 'outlet' && renderNode.name === 'main') ||
+    (renderNode.type === 'route-template' && renderNode.name === '-top-level')
+  );
+}
+
+function focusedInInput() {
+  return ['input', 'textarea'].includes(
+    document.activeElement.tagName.toLowerCase()
+  );
+}
+
+function arrowKeyPressed(keyCode) {
+  return [KEYS.up, KEYS.right, KEYS.down, KEYS.left].includes(keyCode);
 }
 
 class RenderItem {
-  @tracked isExpanded = true;
+  @tracked isExpanded;
 
   constructor(controller, parentItem, renderNode) {
     this.controller = controller;
     this.parentItem = parentItem;
     this.renderNode = renderNode;
+
+    this.isExpanded = this.isExpandable;
   }
 
   get id() {
@@ -276,6 +359,10 @@ class RenderItem {
     return children;
   }
 
+  get isExpandable() {
+    return this.hasChildren;
+  }
+
   get isVisible() {
     if (this.isRoot) {
       return true;
@@ -284,7 +371,7 @@ class RenderItem {
     }
   }
 
-  get isSelected() {
+  get isPinned() {
     return this.id === this.controller.pinned;
   }
 
@@ -316,7 +403,7 @@ class RenderItem {
   }
 
   @action toggleInspection() {
-    if (this.isSelected) {
+    if (this.isPinned) {
       this.controller.pinned = undefined;
     } else {
       this.controller.pinned = this.id;
@@ -346,27 +433,31 @@ class RenderItem {
   }
 
   show() {
-    let item = this.parent;
+    let item = this.parentItem;
 
     while (item) {
       item.expand();
-      item = item.parent;
+      item = item.parentItem;
     }
   }
 
   expand(deep = false) {
-    this.isExpanded = true;
+    if (this.isExpandable) {
+      this.isExpanded = true;
 
-    if (deep === true) {
-      this.childItems.forEach(child => child.expand(true));
+      if (deep === true) {
+        this.childItems.forEach((child) => child.expand(true));
+      }
     }
   }
 
   collapse(deep = false) {
-    this.isExpanded = false;
+    if (this.isExpandable) {
+      this.isExpanded = false;
 
-    if (deep === true) {
-      this.childItems.forEach(child => child.collapse(true));
+      if (deep === true) {
+        this.childItems.forEach((child) => child.collapse(true));
+      }
     }
   }
 

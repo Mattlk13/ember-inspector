@@ -1,10 +1,11 @@
-let define = window.define, requireModule = window.requireModule;
+let define = window.define,
+  requireModule = window.requireModule;
 if (typeof define !== 'function' || typeof requireModule !== 'function') {
+  (function () {
+    let registry = {},
+      seen = {};
 
-  (function() {
-    let registry = {}, seen = {};
-
-    define = function(name, deps, callback) {
+    define = function (name, deps, callback) {
       if (arguments.length < 3) {
         callback = deps;
         deps = [];
@@ -12,15 +13,17 @@ if (typeof define !== 'function' || typeof requireModule !== 'function') {
       registry[name] = { deps, callback };
     };
 
-    requireModule = function(name) {
-      if (seen[name]) { return seen[name]; }
-      seen[name] = {};
+    requireModule = function (name) {
+      if (seen[name]) {
+        return seen[name];
+      }
 
       let mod = registry[name];
-
       if (!mod) {
         throw new Error(`Module: '${name}' not found.`);
       }
+
+      seen[name] = {};
 
       let deps = mod.deps;
       let callback = mod.callback;
@@ -29,7 +32,7 @@ if (typeof define !== 'function' || typeof requireModule !== 'function') {
 
       for (let i = 0, l = deps.length; i < l; i++) {
         if (deps[i] === 'exports') {
-          reified.push(exports = {});
+          reified.push((exports = {}));
         } else {
           reified.push(requireModule(deps[i]));
         }

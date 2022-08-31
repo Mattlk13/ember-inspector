@@ -1,18 +1,12 @@
 /* eslint no-cond-assign:0 */
-import PortMixin from 'ember-debug/mixins/port-mixin';
+import DebugPort from './debug-port';
 import RenderTree from 'ember-debug/libs/render-tree';
 import ViewInspection from 'ember-debug/libs/view-inspection';
 import bound from 'ember-debug/utils/bound-method';
 
-const Ember = window.Ember;
+import { readOnly } from 'ember-debug/utils/ember/object/computed';
 
-const {
-  computed,
-  Object: EmberObject,
-} = Ember;
-const { readOnly } = computed;
-
-export default EmberObject.extend(PortMixin, {
+export default DebugPort.extend({
   namespace: null,
 
   adapter: readOnly('namespace.adapter'),
@@ -53,18 +47,24 @@ export default EmberObject.extend(PortMixin, {
       let { lastRightClicked } = this;
       this.lastRightClicked = null;
       this.inspectNearest(lastRightClicked);
-    }
+    },
   },
 
   init() {
     this._super(...arguments);
 
-    let renderTree = this.renderTree = new RenderTree({
+    let renderTree = (this.renderTree = new RenderTree({
       owner: this.getOwner(),
-      retainObject: bound(this.objectInspector, this.objectInspector.retainObject),
-      releaseObject: bound(this.objectInspector, this.objectInspector.releaseObject),
+      retainObject: bound(
+        this.objectInspector,
+        this.objectInspector.retainObject
+      ),
+      releaseObject: bound(
+        this.objectInspector,
+        this.objectInspector.releaseObject
+      ),
       inspectNode: bound(this, this.inspectNode),
-    });
+    }));
 
     this.viewInspection = new ViewInspection({
       renderTree,
@@ -130,7 +130,7 @@ export default EmberObject.extend(PortMixin, {
    * @param  {Node} node The DOM node to inspect
    */
   inspectNode(node) {
-    this.get('adapter').inspectNode(node);
+    this.adapter.inspectNode(node);
   },
 
   sendTree(immediate = false) {
@@ -155,7 +155,7 @@ export default EmberObject.extend(PortMixin, {
     }
 
     this.sendMessage('renderTree', {
-      tree: this.renderTree.build()
+      tree: this.renderTree.build(),
     });
   },
 
@@ -189,5 +189,5 @@ export default EmberObject.extend(PortMixin, {
 
   getOwner() {
     return this.namespace.owner;
-  }
+  },
 });

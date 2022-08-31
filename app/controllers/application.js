@@ -1,10 +1,11 @@
 import Controller from '@ember/controller';
+import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { equal } from '@ember/object/computed';
-import { schedule } from '@ember/runloop';
+import { debounce, schedule } from '@ember/runloop';
 import { inject as service } from '@ember/service';
 
-export default Controller.extend({
+export default class ApplicationController extends Controller {
   /**
    * Service used to broadcast changes to the application's layout
    * such as toggling of the object inspector.
@@ -12,61 +13,76 @@ export default Controller.extend({
    * @property layoutService
    * @type {Service}
    */
-  layoutService: service('layout'),
+  @service('layout') layoutService;
+  @service port;
 
-  isDragging: false,
-  contentHeight: null,
-
+  // Indicates that the extension window is focused,
+  @tracked active = true;
+  @tracked isDragging = false;
+  @tracked contentHeight = null;
+  @tracked deprecationCount = 0;
+  @tracked inspectorExpanded = false;
+  @tracked inspectorWidth = 360;
   /**
    * Indicates if the inspector has detected an ember app.
    *
    * @type {Boolean}
    */
-  isEmberApplication: false,
+  isEmberApplication = false;
+  @tracked _navWidthExpanded = 180;
+  @tracked _navWidthCollapsed = 48;
+  @tracked navIsCollapsed = false;
 
-  navWidth: 180,
-  inspectorWidth: 360,
-  isChrome: equal('port.adapter.name', 'chrome'),
+  get navWidth() {
+    return this.navIsCollapsed
+      ? this._navWidthCollapsed
+      : this._navWidthExpanded;
+  }
 
-  deprecationCount: 0,
+  set navWidth(value) {
+    this._navWidthExpanded = value;
+  }
 
-  // Indicates that the extension window is focused,
-  active: true,
+  @equal('port.adapter.name', 'chrome')
+  isChrome;
 
-  inspectorExpanded: false,
-
-  init() {
-    this._super(...arguments);
+  constructor() {
+    super(...arguments);
 
     this.mixinStack = [];
     this.mixinDetails = [];
-  },
+  }
 
   /*
    * Called when digging deeper into object stack
    * from within the ObjectInspector
-  */
+   */
+  @action
   pushMixinDetails(name, property, objectId, details, errors) {
     details = {
       name,
       property,
       objectId,
       mixins: details,
-      errors
+      errors,
     };
 
     this.mixinStack.pushObject(details);
     this.set('mixinDetails', details);
-  },
+  }
 
-  popMixinDetails: action(function() {
+  @action
+  popMixinDetails() {
     let mixinStack = this.mixinStack;
     let item = mixinStack.popObject();
     this.set('mixinDetails', mixinStack.get('lastObject'));
-    this.port.send('objectInspector:releaseObject', { objectId: item.objectId });
-  }),
+    this.port.send('objectInspector:releaseObject', {
+      objectId: item.objectId,
+    });
+  }
 
-  showInspector: action(function() {
+  @action
+  showInspector() {
     if (this.inspectorExpanded === false) {
       this.set('inspectorExpanded', true);
       // Broadcast that tables have been resized (used by `x-list`).
@@ -74,9 +90,10 @@ export default Controller.extend({
         this.layoutService.trigger('resize', { source: 'object-inspector' });
       });
     }
-  }),
+  }
 
-  hideInspector: action(function() {
+  @action
+  hideInspector() {
     if (this.inspectorExpanded === true) {
       this.set('inspectorExpanded', false);
       // Broadcast that tables have been resized (used by `x-list`).
@@ -84,32 +101,76 @@ export default Controller.extend({
         this.layoutService.trigger('resize', { source: 'object-inspector' });
       });
     }
-  }),
+  }
 
-  toggleInspector: action(function() {
+  @action
+  toggleInspector() {
     if (this.inspectorExpanded) {
       this.hideInspector();
     } else {
       this.showInspector();
     }
-  }),
+  }
 
-  setActive: action(function(bool) {
-    this.set('active', bool);
-  }),
+  @action
+  setActive(bool) {
+    schedule('afterRender', () => {
+      this.set('active', bool);
+    });
+  }
+
+  @action
+  setupContentElement(element) {
+    this.contentElement = element;
+    this.layoutService.updateContentHeight(this.contentElement.clientHeight);
+  }
+
+  @action
+  _windowDidResize() {
+    schedule('afterRender', () => {
+      if (!this.isDestroyed && !this.isDestroying) {
+        this.layoutService.trigger('resize', {
+          source: 'application-controller',
+        });
+
+        if (this.contentElement) {
+          this.layoutService.updateContentHeight(
+            this.contentElement.clientHeight
+          );
+        }
+      }
+    });
+  }
+
+  @action
+  windowDidResize() {
+    debounce(this, this._windowDidResize, 250);
+  }
+
+  @action
+  toggleNavCollapsed() {
+    this.set('navIsCollapsed', !this.navIsCollapsed);
+    schedule('afterRender', () => {
+      this.layoutService.trigger('resize', { source: 'navigation' });
+    });
+  }
 
   /*
    * Called when inspecting an object from outside of the ObjectInspector
-  */
+   */
+  @action
   activateMixinDetails(name, objectId, details, errors) {
-    this.mixinStack.forEach(item => {
-      this.port.send('objectInspector:releaseObject', { objectId: item.objectId });
+    this.mixinStack.forEach((item) => {
+      this.port.send('objectInspector:releaseObject', {
+        objectId: item.objectId,
+      });
     });
 
     this.set('mixinStack', []);
     this.pushMixinDetails(name, undefined, objectId, details, errors);
-  },
+  }
 
+  @action
   droppedObject(objectId) {
     let mixinStack = this.mixinStack;
     let obj = mixinStack.findBy('objectId', objectId);
@@ -119,7 +180,7 @@ export default Controller.extend({
       for (let i = index; i >= 0; i--) {
         objectsToRemove.pushObject(mixinStack.objectAt(i));
       }
-      objectsToRemove.forEach(item => {
+      objectsToRemove.forEach((item) => {
         mixinStack.removeObject(item);
       });
     }
@@ -128,6 +189,5 @@ export default Controller.extend({
     } else {
       this.set('mixinDetails', null);
     }
-
-  },
-});
+  }
+}

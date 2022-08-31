@@ -3,9 +3,10 @@
 module.exports = {
   extends: 'recommended',
   rules: {
-    'link-rel-noopener': false,
-    'no-inline-styles': false,
-    'no-invalid-interactive': false,
-    'table-groups': false
-  }
+    'no-down-event-binding': false,
+    'no-negated-condition': false,
+
+    // TODO: enable these rules
+    'no-positive-tabindex': false,
+  },
 };

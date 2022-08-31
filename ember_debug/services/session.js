@@ -1,10 +1,9 @@
-const Ember = window.Ember;
-const { Object: EmberObject } = Ember;
+import EmberObject from 'ember-debug/utils/ember/object';
 
 const Session = EmberObject.extend({
   setItem(/*key, val*/) {},
   removeItem(/*key*/) {},
-  getItem(/*key*/) {}
+  getItem(/*key*/) {},
 });
 
 let SESSION_STORAGE_SUPPORTED = false;
@@ -44,7 +43,7 @@ if (SESSION_STORAGE_SUPPORTED) {
     },
     getItem(key) {
       return JSON.parse(this.sessionStorage.getItem(this.makeKey(key)));
-    }
+    },
   });
 }
 

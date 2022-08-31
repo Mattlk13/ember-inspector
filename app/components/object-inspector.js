@@ -1,42 +1,69 @@
-import Component from '@ember/component';
-import { action, computed, get } from '@ember/object';
+import Component from '@glimmer/component';
+import { action, get } from '@ember/object';
+import { inject as service } from '@ember/service';
+import { tracked } from '@glimmer/tracking';
 
-export default Component.extend({
-  tagName: '',
+export default class ObjectInspector extends Component {
+  @service port;
 
-  propDisplayType: 'grouped',
+  @tracked propDisplayType = 'grouped';
+  @tracked customFilter = '';
 
-  trail: computed('model.[]', function () {
-    let nested = this.model.slice(1);
-    if (nested.length === 0) { return ""; }
-    return `.${nested.mapBy('property').join(".")}`;
-  }),
+  constructor() {
+    super(...arguments);
+    this.searchInputId = 'custom-filter-input';
+  }
 
-  isNested: computed('model.[]', function () {
-    return this.get('model.length') > 1;
-  }),
+  get trail() {
+    let nested = this.args.model.slice(1);
+    if (nested.length === 0) {
+      return '';
+    }
+    return `.${nested.mapBy('property').join('.')}`;
+  }
 
-  setPropDisplay: action(function (type) {
-    this.set('propDisplayType', type);
-  }),
+  get isNested() {
+    return this.args.model.length > 1;
+  }
 
-  sendObjectToConsole: action(function (obj) {
+  @action setPropDisplay(type) {
+    // The custom filter is only working for the "all" table yet
+    // Otherwise, we reset the customFilter input value
+    if (type !== 'all') {
+      this.customFilter = '';
+    }
+
+    this.propDisplayType = type;
+  }
+
+  @action setCustomFilter(event) {
+    let { value } = event.target;
+
+    this.propDisplayType = 'all';
+    this.customFilter = value;
+  }
+
+  @action clearCustomFilter() {
+    document.querySelector('#' + this.searchInputId).focus();
+    this.customFilter = '';
+  }
+
+  @action sendObjectToConsole(obj) {
     let objectId = get(obj, 'objectId');
     this.port.send('objectInspector:sendToConsole', {
-      objectId
+      objectId,
     });
-  }),
+  }
 
-  popStack: action(function () {
+  @action popStack() {
     if (this.isNested) {
-      this.popMixinDetails();
+      this.args.popMixinDetails();
     }
-  }),
+  }
 
-  traceErrors: action(function(objectId) {
+  @action traceErrors(objectId) {
     this.port.send('objectInspector:traceErrors', {
-      objectId
+      objectId,
     });
-  })
-});
-
+  }
+}

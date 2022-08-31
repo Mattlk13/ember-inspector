@@ -1,14 +1,13 @@
-import PortMixin from 'ember-debug/mixins/port-mixin';
+import DebugPort from './debug-port';
 import ProfileManager from './models/profile-manager';
 
-const Ember = window.Ember;
-const { subscribe, Object: EmberObject } = Ember;
+import { subscribe } from 'ember-debug/utils/ember/instrumentation';
 
 // Initial setup, that has to occur before the EmberObject init for some reason
 let profileManager = new ProfileManager();
 _subscribeToRenderEvents();
 
-export default EmberObject.extend(PortMixin, {
+export default DebugPort.extend({
   namespace: null,
   portNamespace: 'render',
 
@@ -17,23 +16,28 @@ export default EmberObject.extend(PortMixin, {
   init() {
     this._super();
 
-    this.profileManager.wrapForErrors = (context, callback) => this.get('port').wrap(() => callback.call(context));
+    this.profileManager.wrapForErrors = (context, callback) =>
+      this.port.wrap(() => callback.call(context));
     this.profileManager.onProfilesAdded(this, this._updateComponentTree);
   },
 
   willDestroy() {
     this._super();
 
-    this.profileManager.wrapForErrors = function(context, callback) {
+    this.profileManager.wrapForErrors = function (context, callback) {
       return callback.call(context);
     };
 
     this.profileManager.offProfilesAdded(this, this.sendAdded);
-    this.profileManager.offProfilesAdded(this, this._updateRenderPerformanceAndComponentTree);
+    this.profileManager.offProfilesAdded(this, this._updateComponentTree);
+    this.profileManager.teardown();
   },
 
   sendAdded(profiles) {
-    this.sendMessage('profilesAdded', { profiles });
+    this.sendMessage('profilesAdded', {
+      profiles,
+      isHighlightSupported: this.profileManager.isHighlightEnabled,
+    });
   },
 
   /**
@@ -55,10 +59,16 @@ export default EmberObject.extend(PortMixin, {
     },
 
     watchProfiles() {
-      this.sendMessage('profilesAdded', { profiles: this.profileManager.profiles });
+      this.sendMessage('profilesAdded', {
+        profiles: this.profileManager.profiles,
+      });
       this.profileManager.onProfilesAdded(this, this.sendAdded);
-    }
-  }
+    },
+
+    updateShouldHighlightRender({ shouldHighlightRender }) {
+      this.profileManager.shouldHighlightRender = shouldHighlightRender;
+    },
+  },
 });
 
 /**
@@ -73,9 +83,8 @@ function _subscribeToRenderEvents() {
         type: 'began',
         timestamp,
         payload,
-        now: Date.now()
+        now: Date.now(),
       };
-
       return profileManager.addToQueue(info);
     },
 
@@ -83,11 +92,11 @@ function _subscribeToRenderEvents() {
       const endedInfo = {
         type: 'ended',
         timestamp,
-        payload
+        payload,
       };
 
       const index = profileManager.addToQueue(endedInfo);
       profileManager.queue[beganIndex].endedIndex = index;
-    }
+    },
   });
 }

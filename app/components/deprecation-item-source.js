@@ -1,22 +1,38 @@
-import Component from '@ember/component';
-import { computed } from '@ember/object';
-import { bool, readOnly, and } from '@ember/object/computed';
+import { action } from '@ember/object';
+import { inject as service } from '@ember/service';
 
-export default Component.extend({
-  tagName: '',
+import Component from '@glimmer/component';
+export default class DeprecationItemSource extends Component {
+  @service port;
 
-  known: bool('model.map.source'),
-
-  url: computed('model.map.{line,source}', 'known', function() {
-    let source = this.get('model.map.source');
+  get url() {
+    let source = this.args.itemModel?.map.source;
     if (this.known) {
-      return `${source}:${this.get('model.map.line')}`;
+      return `${source}:${this.args.itemModel?.map.line}`;
     } else {
       return 'Unkown source';
     }
-  }),
+  }
 
-  adapter: readOnly('port.adapter'),
+  get adapter() {
+    return this.port.adapter;
+  }
 
-  isClickable: and('known', 'adapter.canOpenResource')
-});
+  get isClickable() {
+    return this.known && this.adapter.canOpenResource;
+  }
+
+  get known() {
+    return this.args.itemModel?.map.source;
+  }
+
+  @action
+  handleClick() {
+    this.args.traceSource?.(this.args.modelGroup, this.args.itemModel);
+  }
+
+  @action
+  handleRedirect() {
+    this.args.openResource?.(this.args.itemModel?.map);
+  }
+}

@@ -1,9 +1,8 @@
-import TextField from '@ember/component/text-field';
+import { TextField } from '@ember/legacy-built-in-components';
 
-export default TextField.extend({
+export default class PropertyField extends TextField {
   didInsertElement() {
     this.element.select();
-    return this._super(...arguments);
+    return super.didInsertElement(...arguments);
   }
-});
-
+}

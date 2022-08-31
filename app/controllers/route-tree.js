@@ -1,21 +1,31 @@
 import { alias } from '@ember/object/computed';
-import { action, computed } from '@ember/object';
+import { action, computed, set } from '@ember/object';
 import Controller, { inject as controller } from '@ember/controller';
+import { inject as service } from '@ember/service';
 import checkCurrentRoute from 'ember-inspector/utils/check-current-route';
 import searchMatch from 'ember-inspector/utils/search-match';
 import isRouteSubstate from 'ember-inspector/utils/is-route-substate';
 
-export default Controller.extend({
-  application: controller(),
+export default class RouteTreeController extends Controller {
+  @controller application;
+  @service port;
 
-  queryParams: ['hideRoutes'],
+  queryParams = ['hideRoutes'];
 
-  currentRoute: null,
-  hideRoutes: alias('options.hideRoutes'),
-  searchValue: '',
+  currentRoute = null;
 
-  filtered: computed('model.[]', 'options.{hideRoutes,hideSubstates}', 'currentRoute.{name,url}', 'searchValue', function() {
-    return this.model.filter(routeItem => {
+  searchValue = '';
+
+  @alias('options.hideRoutes') hideRoutes;
+
+  @computed(
+    'model.[]',
+    'options.{hideRoutes,hideSubstates}',
+    'currentRoute.{name,url}',
+    'searchValue'
+  )
+  get filtered() {
+    return this.model.filter((routeItem) => {
       let currentRoute = this.currentRoute;
       let hideRoutes = this.get('options.hideRoutes');
       let hideSubstates = this.get('options.hideSubstates');
@@ -34,44 +44,51 @@ export default Controller.extend({
 
       return true;
     });
-  }),
+  }
 
-  rows: computed('filtered.[]', function() {
-    return this.filtered.map(function(route) {
+  @computed('filtered.[]')
+  get rows() {
+    return this.filtered.map(function (route) {
       return {
         name: route,
         objects: route,
-        url: route
+        url: route,
       };
     });
-  }),
+  }
 
   init() {
-    this._super(...arguments);
+    super.init(...arguments);
 
-    this.model = [];
-    this.options = {
+    set(this, 'model', []);
+    set(this, 'options', {
       hideRoutes: false,
-      hideSubstates: false
-    };
-  },
+      hideSubstates: false,
+    });
+  }
 
-  inspectRoute: action(function(name) {
+  @action
+  inspectRoute(name) {
     this.port.send('objectInspector:inspectRoute', { name });
-  }),
+  }
 
-  sendRouteHandlerToConsole: action(function(name) {
+  @action
+  sendRouteHandlerToConsole(name) {
     this.port.send('objectInspector:sendRouteHandlerToConsole', { name });
-  }),
+  }
 
-  inspectController: action(function(controller) {
+  @action
+  inspectController(controller) {
     if (!controller.exists) {
       return;
     }
-    this.port.send('objectInspector:inspectController', { name: controller.name });
-  }),
+    this.port.send('objectInspector:inspectController', {
+      name: controller.name,
+    });
+  }
 
-  sendControllerToConsole: action(function(name) {
+  @action
+  sendControllerToConsole(name) {
     this.port.send('objectInspector:sendControllerToConsole', { name });
-  }),
-});
+  }
+}

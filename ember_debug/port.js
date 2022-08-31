@@ -1,11 +1,16 @@
-const Ember = window.Ember;
-const { Object: EmberObject, computed, run } = Ember;
-const { or, readOnly } = computed;
+import EmberObject, { computed } from 'ember-debug/utils/ember/object';
+import { or, readOnly } from 'ember-debug/utils/ember/object/computed';
+import Evented from 'ember-debug/utils/ember/object/evented';
+import { guidFor } from 'ember-debug/utils/ember/object/internals';
+import { run } from 'ember-debug/utils/ember/runloop';
 
-export default EmberObject.extend(Ember.Evented, {
+export default EmberObject.extend(Evented, {
   adapter: readOnly('namespace.adapter'),
   applicationId: readOnly('namespace.applicationId'),
-  applicationName: or('namespace._application.name', 'namespace._application.modulePrefix').readOnly(),
+  applicationName: or(
+    'namespace._application.name',
+    'namespace._application.modulePrefix'
+  ).readOnly(),
 
   /**
    * Unique id per application (not application instance). It's very important
@@ -15,8 +20,8 @@ export default EmberObject.extend(Ember.Evented, {
    * @property uniqueId
    * @type {String}
    */
-  uniqueId: computed('namespace._application', function() {
-    return Ember.guidFor(this.get('namespace._application'));
+  uniqueId: computed('namespace._application', function () {
+    return guidFor(this.get('namespace._application'));
   }),
 
   init() {
@@ -28,8 +33,8 @@ export default EmberObject.extend(Ember.Evented, {
      */
     this.now = Date.now();
 
-    this.get('adapter').onMessageReceived(message => {
-      if (this.get('uniqueId') === message.applicationId || !message.applicationId) {
+    this.adapter.onMessageReceived((message) => {
+      if (this.uniqueId === message.applicationId || !message.applicationId) {
         this.messageReceived(message.type, message);
       }
     });
@@ -50,7 +55,7 @@ export default EmberObject.extend(Ember.Evented, {
     if (name.startsWith('view:')) {
       try {
         this.trigger(name, message);
-      } catch(error) {
+      } catch (error) {
         this.adapter.handleError(error);
       }
     } else {
@@ -63,9 +68,9 @@ export default EmberObject.extend(Ember.Evented, {
   send(messageType, options = {}) {
     options.type = messageType;
     options.from = 'inspectedWindow';
-    options.applicationId = this.get('uniqueId');
-    options.applicationName = this.get('applicationName');
-    this.get('adapter').send(options);
+    options.applicationId = this.uniqueId;
+    options.applicationName = this.applicationName;
+    this.adapter.send(options);
   },
 
   /**
@@ -85,12 +90,12 @@ export default EmberObject.extend(Ember.Evented, {
    * @return {Mixed} The return value of the passed function
    */
   wrap(fn) {
-    return run(this, function() {
+    return run(this, function () {
       try {
         return fn();
-      } catch(error) {
-        this.get('adapter').handleError(error);
+      } catch (error) {
+        this.adapter.handleError(error);
       }
     });
-  }
+  },
 });

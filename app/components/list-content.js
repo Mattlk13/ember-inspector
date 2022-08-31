@@ -1,9 +1,9 @@
-import Component from '@ember/component';
-import { htmlSafe } from '@ember/string';
-import Evented from '@ember/object/evented';
-import { computed } from '@ember/object';
-import { schedule } from '@ember/runloop';
+import { action, computed } from '@ember/object';
 import { inject as service } from '@ember/service';
+import Component from '@ember/component';
+import { htmlSafe } from '@ember/template';
+import Evented from '@ember/object/evented';
+import { schedule } from '@ember/runloop';
 
 /**
  * Base list view config
@@ -13,23 +13,17 @@ import { inject as service } from '@ember/service';
  * @class List
  * @namespace Components
  */
-export default Component.extend(Evented, {
+export default class ListContent extends Component.extend(Evented) {
   /**
    * The layout service. Used to observe the app's content height.
    *
    * @property layoutService
    * @type {Service}
    */
-  layoutService: service('layout'),
+  @service('layout') layoutService;
 
-  /**
-   * @property classNames
-   * @type {Array}
-   */
-  classNames: ["list__content", "js-list-content"],
-
-  init() {
-    this._super(...arguments);
+  constructor() {
+    super(...arguments);
 
     /**
      * Array of objects representing the columns to render
@@ -42,26 +36,32 @@ export default Component.extend(Evented, {
      * @type {Array}
      */
     this.columns = [];
-  },
+  }
 
   /**
    * Hook called when content element is inserted.
    *
-   * @method didInsertElement
+   * @method elementInserted
    */
-  didInsertElement() {
+  @action
+  elementInserted() {
     schedule('afterRender', this, this.setupHeight);
-  },
+  }
 
   /**
    * Set up the content height and listen to any updates to that property.
    *
    * @method setupHeight
    */
+  @action
   setupHeight() {
     this.set('contentHeight', this.get('layoutService.contentHeight'));
-    this.layoutService.on('content-height-update', this, this.updateContentHeight);
-  },
+    this.layoutService.on(
+      'content-height-update',
+      this,
+      this.updateContentHeight
+    );
+  }
 
   /**
    * Triggered whenever the app's content height changes. This usually happens
@@ -81,24 +81,26 @@ export default Component.extend(Evented, {
     if (previousHeight === 0 && height > 0) {
       this.rerender();
     }
-
-  },
+  }
 
   /**
    * Hook called before destruction. Clean up events listeners.
    *
-   * @method willDestroyElement
+   * @method willDestroy
    */
-  willDestroyElement() {
-    this.layoutService.off('content-height-update', this, this.updateContentHeight);
-    return this._super(...arguments);
-  },
+  willDestroy() {
+    this.layoutService.off(
+      'content-height-update',
+      this,
+      this.updateContentHeight
+    );
+    return super.willDestroy(...arguments);
+  }
 
-  attributeBindings: ['style'],
-
-  style: computed('height', function() {
+  @computed('height')
+  get style() {
     return htmlSafe(`height:${this.height}px`);
-  }),
+  }
 
   /**
    * Number passed from `list`. Indicates the header height
@@ -107,13 +109,14 @@ export default Component.extend(Evented, {
    * @property headerHeight
    * @type {Number}
    */
-  headerHeight: null,
+  headerHeight = null;
 
   /**
    * @property height
    * @type {Integer}
    */
-  height: computed('contentHeight', 'headerHeight', function() {
+  @computed('contentHeight', 'headerHeight')
+  get height() {
     let headerHeight = this.headerHeight;
     let contentHeight = this.contentHeight;
 
@@ -123,5 +126,5 @@ export default Component.extend(Evented, {
       return 1;
     }
     return contentHeight - headerHeight;
-  })
-});
+  }
+}

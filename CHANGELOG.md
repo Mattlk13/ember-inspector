@@ -1,5 +1,418 @@
 # Changelog
 
+## v4.7.1 (2022-08-31)
+
+#### :house: Internal
+* [#2127](https://github.com/emberjs/ember-inspector/pull/2127) Add back del ([@rwwagner90](https://github.com/rwwagner90))
+
+#### Committers: 1
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+
+## v4.7.0 (2022-08-31)
+
+#### :house: Internal
+* [#2124](https://github.com/emberjs/ember-inspector/pull/2124) Update to ember 4 ([@rwwagner90](https://github.com/rwwagner90))
+* [#2122](https://github.com/emberjs/ember-inspector/pull/2122) Convert some components to glimmer ([@rwwagner90](https://github.com/rwwagner90))
+* [#2123](https://github.com/emberjs/ember-inspector/pull/2123) Update ember cli ([@rwwagner90](https://github.com/rwwagner90))
+* [#2121](https://github.com/emberjs/ember-inspector/pull/2121) Remove unused dep `del` ([@rwwagner90](https://github.com/rwwagner90))
+
+#### Committers: 2
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+- [@patricklx](https://github.com/patricklx)
+
+## v4.6.3 (2022-08-19)
+
+#### :bug: Bug Fix
+* [#2108](https://github.com/emberjs/ember-inspector/pull/2108) fix ember inspector not loading ([@patricklx](https://github.com/patricklx))
+
+#### Committers: 1
+- [@patricklx](https://github.com/patricklx)
+
+## v4.6.2 (2022-08-18)
+
+#### :bug: Bug Fix
+* [#2105](https://github.com/emberjs/ember-inspector/pull/2105) fix ember inspector not loading ([@patricklx](https://github.com/patricklx))
+
+#### Committers: 1
+- [@patricklx](https://github.com/patricklx)
+
+## v4.6.1 (2022-08-17)
+
+#### :bug: Bug Fix
+* [#2100](https://github.com/emberjs/ember-inspector/pull/2100) Silence Ember.global deprecation messages when consumers use 3.28 with `throwOnUnhandled: true` ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+
+#### Committers: 1
+- [@NullVoxPopuli](https://github.com/NullVoxPopuli)
+
+## v4.6.0 (2022-08-17)
+
+#### :rocket: Enhancement
+* [#2040](https://github.com/emberjs/ember-inspector/pull/2040) do not close the object inspector ([@patricklx](https://github.com/patricklx))
+* [#1905](https://github.com/emberjs/ember-inspector/pull/1905) enhancement(view-inspection): increased z-index for highlight and tooltip ([@andrewmnlv](https://github.com/andrewmnlv))
+* [#1959](https://github.com/emberjs/ember-inspector/pull/1959) component-tree: make left/right arrow nav in certain conditions (Closes [#1537](https://github.com/emberjs/ember-inspector/issues/1537)) ([@geneukum](https://github.com/geneukum))
+
+#### :bug: Bug Fix
+* [#2051](https://github.com/emberjs/ember-inspector/pull/2051) fix loading ember-inspector after reload ([@patricklx](https://github.com/patricklx))
+* [#2052](https://github.com/emberjs/ember-inspector/pull/2052) fix component tree item show ([@patricklx](https://github.com/patricklx))
+* [#2043](https://github.com/emberjs/ember-inspector/pull/2043) bring back the inspect component context menu functionality ([@patricklx](https://github.com/patricklx))
+* [#2008](https://github.com/emberjs/ember-inspector/pull/2008) Deprecation toolbar clear btn does not clear deprecations ([@geneukum](https://github.com/geneukum))
+* [#1940](https://github.com/emberjs/ember-inspector/pull/1940) Remove support for the TargetActionSupport mixin ([@Windvis](https://github.com/Windvis))
+
+#### :house: Internal
+* [#2103](https://github.com/emberjs/ember-inspector/pull/2103) Remove automated uploads ([@rwwagner90](https://github.com/rwwagner90))
+* [#2101](https://github.com/emberjs/ember-inspector/pull/2101) Download panes from GitHub instead of S3 ([@rwwagner90](https://github.com/rwwagner90))
+* [#2054](https://github.com/emberjs/ember-inspector/pull/2054) Convert controllers to native classes ([@rwwagner90](https://github.com/rwwagner90))
+* [#2053](https://github.com/emberjs/ember-inspector/pull/2053) Convert ToolbarSearchField to glimmer ([@rwwagner90](https://github.com/rwwagner90))
+* [#2041](https://github.com/emberjs/ember-inspector/pull/2041) ember-cli 4.4.0, fix some lint ([@rwwagner90](https://github.com/rwwagner90))
+* [#1998](https://github.com/emberjs/ember-inspector/pull/1998) list-cell: convert to glimmer ([@geneukum](https://github.com/geneukum))
+* [#1990](https://github.com/emberjs/ember-inspector/pull/1990) resizable-column: convert to glimmer ([@geneukum](https://github.com/geneukum))
+* [#1991](https://github.com/emberjs/ember-inspector/pull/1991) object-inspector-test: fix legacy-attribute-arguments issue ([@geneukum](https://github.com/geneukum))
+* [#1987](https://github.com/emberjs/ember-inspector/pull/1987) render-item: fixup no-curly-component-invocation ([@geneukum](https://github.com/geneukum))
+* [#1988](https://github.com/emberjs/ember-inspector/pull/1988) eslintrc: enable 'no-actions-hash' lint rule ([@geneukum](https://github.com/geneukum))
+* [#1989](https://github.com/emberjs/ember-inspector/pull/1989) eslintrc: enable no-test-import-export rule ([@geneukum](https://github.com/geneukum))
+* [#1973](https://github.com/emberjs/ember-inspector/pull/1973) deprecations: resolve instances of this-property-fallback ([@geneukum](https://github.com/geneukum))
+* [#1976](https://github.com/emberjs/ember-inspector/pull/1976) deprecations: fixup instances of no-inline-styles ([@geneukum](https://github.com/geneukum))
+* [#1974](https://github.com/emberjs/ember-inspector/pull/1974) deprecations: fix instances of routing-transition-methods ([@geneukum](https://github.com/geneukum))
+* [#1975](https://github.com/emberjs/ember-inspector/pull/1975) list: fixup dot access for run.bind deprecation ([@geneukum](https://github.com/geneukum))
+* [#1972](https://github.com/emberjs/ember-inspector/pull/1972) properties-base, properties-grouped, properties-all: octane/glimmer upgrade  ([@geneukum](https://github.com/geneukum))
+* [#1961](https://github.com/emberjs/ember-inspector/pull/1961) object-inspector: migrate to glimmer component ([@geneukum](https://github.com/geneukum))
+* [#1906](https://github.com/emberjs/ember-inspector/pull/1906) octane migration - deprecation-item-source ([@michaelbdai](https://github.com/michaelbdai))
+
+#### Committers: 6
+- Bing Dai ([@michaelbdai](https://github.com/michaelbdai))
+- Geordan Neukum ([@geneukum](https://github.com/geneukum))
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+- Sam Van Campenhout ([@Windvis](https://github.com/Windvis))
+- [@andrewmnlv](https://github.com/andrewmnlv)
+- [@patricklx](https://github.com/patricklx)
+
+## v4.5.11 (2021-12-27)
+
+#### :bug: Bug Fix
+* [#1848](https://github.com/emberjs/ember-inspector/pull/1848) Force startup-wrapper logic to run less times ([@rwwagner90](https://github.com/rwwagner90))
+
+#### :house: Internal
+* [#1858](https://github.com/emberjs/ember-inspector/pull/1858) Node 14.18.2 ([@rwwagner90](https://github.com/rwwagner90))
+
+#### Committers: 1
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+
+## v4.5.10 (2021-12-15)
+
+## v4.5.9 (2021-12-15)
+
+#### :bug: Bug Fix
+* [#1845](https://github.com/emberjs/ember-inspector/pull/1845) Fix setting _lastPromise computed deprecation ([@rwwagner90](https://github.com/rwwagner90))
+* [#1844](https://github.com/emberjs/ember-inspector/pull/1844) Fix ember-debug imports ([@rwwagner90](https://github.com/rwwagner90))
+
+#### :house: Internal
+* [#1847](https://github.com/emberjs/ember-inspector/pull/1847) Fix chrome publishing again ([@chancancode](https://github.com/chancancode))
+* [#1846](https://github.com/emberjs/ember-inspector/pull/1846) Enable ember/require-tagless-components ([@rwwagner90](https://github.com/rwwagner90))
+
+#### Committers: 2
+- Godfrey Chan ([@chancancode](https://github.com/chancancode))
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+
+## v4.5.8 (2021-12-14)
+
+#### :house: Internal
+* [#1843](https://github.com/emberjs/ember-inspector/pull/1843) Fix firefox publishing ([@chancancode](https://github.com/chancancode))
+* [#1842](https://github.com/emberjs/ember-inspector/pull/1842) Fix chrome publishing ([@chancancode](https://github.com/chancancode))
+
+#### Committers: 1
+- Godfrey Chan ([@chancancode](https://github.com/chancancode))
+
+## v4.5.7 (2021-12-13)
+
+#### :house: Internal
+* [#1840](https://github.com/emberjs/ember-inspector/pull/1840) Disable more flaky tests ([@rwwagner90](https://github.com/rwwagner90))
+
+#### Committers: 1
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+
+## v4.5.6 (2021-12-13)
+
+#### :house: Internal
+* [#1839](https://github.com/emberjs/ember-inspector/pull/1839) Skip flaky container:types test ([@rwwagner90](https://github.com/rwwagner90))
+
+#### Committers: 1
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+
+## v4.5.5 (2021-12-13)
+
+#### :bug: Bug Fix
+* [#1807](https://github.com/emberjs/ember-inspector/pull/1807) bug: Find the latest entry created by lerna-changelog ([@mdeanjones](https://github.com/mdeanjones))
+
+#### :memo: Documentation
+* [#1821](https://github.com/emberjs/ember-inspector/pull/1821) docs(readme): change order of installation hints ([@derrabauke](https://github.com/derrabauke))
+
+#### :house: Internal
+* [#1833](https://github.com/emberjs/ember-inspector/pull/1833) fix issue, test destroyed the component before EmberDebugger is destr… ([@michaelbdai](https://github.com/michaelbdai))
+* [#1829](https://github.com/emberjs/ember-inspector/pull/1829) Use new VC and ember-table betas ([@rwwagner90](https://github.com/rwwagner90))
+
+#### Committers: 4
+- Bing Dai ([@michaelbdai](https://github.com/michaelbdai))
+- Falk Neumann ([@derrabauke](https://github.com/derrabauke))
+- Michael Jones ([@mdeanjones](https://github.com/mdeanjones))
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+
+## v4.5.4 (2021-11-23)
+
+#### :bug: Bug Fix
+* [#1814](https://github.com/emberjs/ember-inspector/pull/1814) replace `[].any` with `[].some` ([@Windvis](https://github.com/Windvis))
+
+#### :house: Internal
+* [#1804](https://github.com/emberjs/ember-inspector/pull/1804) Try to fix owner errors ([@rwwagner90](https://github.com/rwwagner90))
+
+#### Committers: 2
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+- Sam Van Campenhout ([@Windvis](https://github.com/Windvis))
+
+## v4.5.3 (2021-11-18)
+
+#### :bug: Bug Fix
+* [#1803](https://github.com/emberjs/ember-inspector/pull/1803) Replace ember-did-resize-modifier with ember-on-resize-modifier ([@rwwagner90](https://github.com/rwwagner90))
+
+#### :house: Internal
+* [#1802](https://github.com/emberjs/ember-inspector/pull/1802) ESLint 8 support ([@rwwagner90](https://github.com/rwwagner90))
+
+#### Committers: 1
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+
+## v4.5.2 (2021-11-17)
+
+#### :bug: Bug Fix
+* [#1780](https://github.com/emberjs/ember-inspector/pull/1780) fix startup bug in Firefox (Closes [#1770](https://github.com/emberjs/ember-inspector/issues/1770)) ([@luxferresum](https://github.com/luxferresum))
+
+#### :house: Internal
+* [#1793](https://github.com/emberjs/ember-inspector/pull/1793) Remove ember-did-resize-modifier dep (for now?) ([@chancancode](https://github.com/chancancode))
+* [#1783](https://github.com/emberjs/ember-inspector/pull/1783) Update publish-chrome action to use node 14.X ([@kdagnan](https://github.com/kdagnan))
+* [#1782](https://github.com/emberjs/ember-inspector/pull/1782) Update Chrome Publish Action to Use New Command ([@kdagnan](https://github.com/kdagnan))
+* [#1771](https://github.com/emberjs/ember-inspector/pull/1771) remove port mixin ([@michaelbdai](https://github.com/michaelbdai))
+
+#### Committers: 5
+- Bing Dai ([@michaelbdai](https://github.com/michaelbdai))
+- Godfrey Chan ([@chancancode](https://github.com/chancancode))
+- Igor Kvasnička ([@IgorKvasn](https://github.com/IgorKvasn))
+- Kyle D. ([@kdagnan](https://github.com/kdagnan))
+- Lukas Kohler ([@luxferresum](https://github.com/luxferresum))
+
+
+## v4.5.1 (2021-11-02)
+
+## v4.5.0 (2021-11-02)
+
+#### :rocket: Enhancement
+* [#1730](https://github.com/emberjs/ember-inspector/pull/1730) Update ember-flatpickr ([@rwwagner90](https://github.com/rwwagner90))
+* [#1685](https://github.com/emberjs/ember-inspector/pull/1685) add highlight render option to Render Performance tab ([@michaelbdai](https://github.com/michaelbdai))
+
+#### :bug: Bug Fix
+* [#1760](https://github.com/emberjs/ember-inspector/pull/1760) Don't rely on Ember.EmberInspectorDebugger ([@sandstrom](https://github.com/sandstrom))
+
+#### :house: Internal
+* [#1759](https://github.com/emberjs/ember-inspector/pull/1759) Fix release-it-lerna-changelog ([@rwwagner90](https://github.com/rwwagner90))
+* [#1750](https://github.com/emberjs/ember-inspector/pull/1750) fixed all the beta build test failures ([@michaelbdai](https://github.com/michaelbdai))
+* [#1733](https://github.com/emberjs/ember-inspector/pull/1733) Recreate yarn.lock ([@rwwagner90](https://github.com/rwwagner90))
+* [#1741](https://github.com/emberjs/ember-inspector/pull/1741) Fix build ([@chancancode](https://github.com/chancancode))
+* [#1731](https://github.com/emberjs/ember-inspector/pull/1731) Fix deprecated use of `run.debounce` ([@chancancode](https://github.com/chancancode))
+* [#1714](https://github.com/emberjs/ember-inspector/pull/1714) Use forks of packages ([@rwwagner90](https://github.com/rwwagner90))
+* [#1727](https://github.com/emberjs/ember-inspector/pull/1727) Refactor legacy/bespoke injection patterns into services ([@chancancode](https://github.com/chancancode))
+* [#1695](https://github.com/emberjs/ember-inspector/pull/1695) Update ember-test-selectors ([@rwwagner90](https://github.com/rwwagner90))
+* [#1683](https://github.com/emberjs/ember-inspector/pull/1683) Remove toolbar outlet, remove more global Ember ([@rwwagner90](https://github.com/rwwagner90))
+* [#1680](https://github.com/emberjs/ember-inspector/pull/1680) ember-cli 3.27, fix some lint ([@rwwagner90](https://github.com/rwwagner90))
+* [#1619](https://github.com/emberjs/ember-inspector/pull/1619) Move changelog heading to top ([@sandstrom](https://github.com/sandstrom))
+
+#### Committers: 4
+- Bing Dai ([@michaelbdai](https://github.com/michaelbdai))
+- Godfrey Chan ([@chancancode](https://github.com/chancancode))
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+- [@sandstrom](https://github.com/sandstrom)
+
+## v4.4.1 (2021-05-25)
+
+#### :bug: Bug Fix
+* [#1601](https://github.com/emberjs/ember-inspector/pull/1601) Ensure vendored loader does not cache missing modules. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+## v4.4.0 (2021-05-21)
+
+#### :rocket: Enhancement
+* [#1577](https://github.com/emberjs/ember-inspector/pull/1577) Add app config tab ([@hannakim91](https://github.com/hannakim91))
+
+#### :bug: Bug Fix
+* [#1493](https://github.com/emberjs/ember-inspector/pull/1493) Change message type to switch to components route ([@rwwagner90](https://github.com/rwwagner90))
+
+#### :house: Internal
+* [#1592](https://github.com/emberjs/ember-inspector/pull/1592) Start on eslint-plugin-ember 10 updates ([@rwwagner90](https://github.com/rwwagner90))
+* [#1591](https://github.com/emberjs/ember-inspector/pull/1591) Fix some template lint issues ([@rwwagner90](https://github.com/rwwagner90))
+* [#1590](https://github.com/emberjs/ember-inspector/pull/1590) Fix no-invalid-interactive ([@rwwagner90](https://github.com/rwwagner90))
+* [#1559](https://github.com/emberjs/ember-inspector/pull/1559) ember lookup util ([@lifeart](https://github.com/lifeart))
+* [#1535](https://github.com/emberjs/ember-inspector/pull/1535) Use `requireModule('ember')` instead of `window.Ember` ([@rwwagner90](https://github.com/rwwagner90))
+* [#1528](https://github.com/emberjs/ember-inspector/pull/1528) Run dependabot less often ([@sandstrom](https://github.com/sandstrom))
+
+#### Committers: 5
+- Alex Kanunnikov ([@lifeart](https://github.com/lifeart))
+- Hanna (she/her) ([@hannakim91](https://github.com/hannakim91))
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+- [@sandstrom](https://github.com/sandstrom)
+
+## v4.3.5 (2021-03-10)
+
+#### :bug: Bug Fix
+* [#1445](https://github.com/emberjs/ember-inspector/pull/1445) Bypass unresolved route promises in route-debug ([@steventsao](https://github.com/steventsao))
+
+#### :house: Internal
+* [#1509](https://github.com/emberjs/ember-inspector/pull/1509) Migrate to volta-cli/action ([@steventsao](https://github.com/steventsao))
+
+#### Committers: 4
+- Ricardo Mendes ([@locks](https://github.com/locks))
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+- Steven Tsao ([@steventsao](https://github.com/steventsao))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
+
+## v4.3.2 (2020-08-17)
+
+## v4.3.1 (2020-08-16)
+
+## v4.3.0 (2020-08-16)
+
+#### :rocket: Enhancement
+* [#1273](https://github.com/emberjs/ember-inspector/pull/1273) Collapsible Navigation ([@nummi](https://github.com/nummi))
+
+#### :bug: Bug Fix
+* [#1299](https://github.com/emberjs/ember-inspector/pull/1299) Ensure `valueForTag` is passed an actual `Tag` ([@rwjblue](https://github.com/rwjblue))
+* [#1227](https://github.com/emberjs/ember-inspector/pull/1227) fix get class name ([@patricklx](https://github.com/patricklx))
+
+#### :house: Internal
+* [#1311](https://github.com/emberjs/ember-inspector/pull/1311) Add rwjblue release-it config ([@rwwagner90](https://github.com/rwwagner90))
+* [#1309](https://github.com/emberjs/ember-inspector/pull/1309) Fix some tests ([@rwwagner90](https://github.com/rwwagner90))
+* [#1247](https://github.com/emberjs/ember-inspector/pull/1247) Update eslint-plugin-ember, fix lint ([@rwwagner90](https://github.com/rwwagner90))
+* [#1185](https://github.com/emberjs/ember-inspector/pull/1185) Start converting some things to octane ([@rwwagner90](https://github.com/rwwagner90))
+* [#1219](https://github.com/emberjs/ember-inspector/pull/1219) Prevent future ember/no-mixins eslint error ([@ansmonjol](https://github.com/ansmonjol))
+* [#1215](https://github.com/emberjs/ember-inspector/pull/1215) Refactor `scripts/` to use more modern Node idioms. ([@rwjblue](https://github.com/rwjblue))
+* [#1206](https://github.com/emberjs/ember-inspector/pull/1206) Add Prettier to ESLint configuration. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 7
+- Alexandre Monjol ([@ansmonjol](https://github.com/ansmonjol))
+- Godfrey Chan ([@chancancode](https://github.com/chancancode))
+- Jerry Nummi ([@nummi](https://github.com/nummi))
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- Robert Wagner ([@rwwagner90](https://github.com/rwwagner90))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+- [@patricklx](https://github.com/patricklx)
+
+## [v4.1.0](https://github.com/emberjs/ember-inspector/tree/v4.1.0) (2020-05-12)
+
+[Full Changelog](https://github.com/emberjs/ember-inspector/compare/v4.0.1...v4.1.0)
+
+**Implemented enhancements:**
+
+- Add ability to sort container instances alphabetically [\#1198](https://github.com/emberjs/ember-inspector/pull/1198) ([lukemelia](https://github.com/lukemelia))
+
+**Fixed bugs:**
+
+- Rendering tests unusable in ember-inspectors test suite [\#1201](https://github.com/emberjs/ember-inspector/issues/1201)
+- Can't see full list of components in `Components` tab after 4.0.0 [\#1200](https://github.com/emberjs/ember-inspector/issues/1200)
+- Component Tree - dissapears if modal-dialog used and focused using component explorer [\#1195](https://github.com/emberjs/ember-inspector/issues/1195)
+- Component tree: incorrect string component arguments serialization [\#1190](https://github.com/emberjs/ember-inspector/issues/1190)
+- Ensure renderDebug is properly unregistered. [\#1202](https://github.com/emberjs/ember-inspector/pull/1202) ([rwjblue](https://github.com/rwjblue))
+- Upgrade to Ember 3.18 to fix list rendering issue [\#1196](https://github.com/emberjs/ember-inspector/pull/1196) ([chancancode](https://github.com/chancancode))
+- Fix string arguments in component tree to render only one pair of double quotes fixes \#1190 [\#1193](https://github.com/emberjs/ember-inspector/pull/1193) ([SYU15](https://github.com/SYU15))
+- fix attrs/args - toString is undefined [\#1189](https://github.com/emberjs/ember-inspector/pull/1189) ([patricklx](https://github.com/patricklx))
+
+**Merged pull requests:**
+
+- Bump jquery from 3.4.1 to 3.5.1 [\#1207](https://github.com/emberjs/ember-inspector/pull/1207) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Remove private API usage to set moduleName in view debug tests. [\#1205](https://github.com/emberjs/ember-inspector/pull/1205) ([rwjblue](https://github.com/rwjblue))
+- Introduce `setupEmberDebugTest` test helper. [\#1204](https://github.com/emberjs/ember-inspector/pull/1204) ([rwjblue](https://github.com/rwjblue))
+- Reset internal test helper state for EmberDebug tests. [\#1203](https://github.com/emberjs/ember-inspector/pull/1203) ([rwjblue](https://github.com/rwjblue))
+- Add 4.0.0 changelog, bump minor version [\#1188](https://github.com/emberjs/ember-inspector/pull/1188) ([rwwagner90](https://github.com/rwwagner90))
+- No observers lint rule [\#1181](https://github.com/emberjs/ember-inspector/pull/1181) ([ansmonjol](https://github.com/ansmonjol))
+
+## [v4.0.1](https://github.com/emberjs/ember-inspector/tree/v4.0.1) (2020-05-06)
+
+[Full Changelog](https://github.com/emberjs/ember-inspector/compare/v4.0.0...v4.0.1)
+
+## [v4.0.0](https://github.com/emberjs/ember-inspector/tree/v4.0.0) (2020-05-06)
+
+[Full Changelog](https://github.com/emberjs/ember-inspector/compare/v3.13.2...v4.0.0)
+
+**Implemented enhancements:**
+
+- Filter out object properties by property name filter/search [\#1171](https://github.com/emberjs/ember-inspector/issues/1171)
+- Implement Keyboard Navigation in the Component Tree [\#1142](https://github.com/emberjs/ember-inspector/issues/1142)
+- feat: allow object arguments in component tree to be inspected [\#1175](https://github.com/emberjs/ember-inspector/pull/1175) ([SYU15](https://github.com/SYU15))
+- Filter out object properties by property name filter/search [\#1172](https://github.com/emberjs/ember-inspector/pull/1172) ([ansmonjol](https://github.com/ansmonjol))
+- More functional classes and data-test selectors [\#1168](https://github.com/emberjs/ember-inspector/pull/1168) ([nummi](https://github.com/nummi))
+- \[FEAT\] Add inspect store button to data pane in Ember Inspector [\#1163](https://github.com/emberjs/ember-inspector/pull/1163) ([SYU15](https://github.com/SYU15))
+- Component Tree Arrow Key Navigation [\#1153](https://github.com/emberjs/ember-inspector/pull/1153) ([nummi](https://github.com/nummi))
+- `lib/ui` utility classes [\#1147](https://github.com/emberjs/ember-inspector/pull/1147) ([nummi](https://github.com/nummi))
+- Add args to tree [\#1112](https://github.com/emberjs/ember-inspector/pull/1112) ([rwwagner90](https://github.com/rwwagner90))
+
+**Fixed bugs:**
+
+- fix component attrs inspect [\#1150](https://github.com/emberjs/ember-inspector/pull/1150) ([patricklx](https://github.com/patricklx))
+- fix component args inspect [\#1149](https://github.com/emberjs/ember-inspector/pull/1149) ([patricklx](https://github.com/patricklx))
+
+**Closed issues:**
+
+- Upgrade to latest ember-{source,cli,data} [\#1148](https://github.com/emberjs/ember-inspector/issues/1148)
+- Inspector breaks filestack.com account dashboard [\#1145](https://github.com/emberjs/ember-inspector/issues/1145)
+- Privacy Policy [\#1139](https://github.com/emberjs/ember-inspector/issues/1139)
+- Inspector breaks geocaching.com [\#1133](https://github.com/emberjs/ember-inspector/issues/1133)
+
+**Merged pull requests:**
+
+- Update to major version 4.0.0 [\#1187](https://github.com/emberjs/ember-inspector/pull/1187) ([rwwagner90](https://github.com/rwwagner90))
+- Disable `fail-fast` for `ember-try` [\#1186](https://github.com/emberjs/ember-inspector/pull/1186) ([chancancode](https://github.com/chancancode))
+- Remove moment, bump deps [\#1184](https://github.com/emberjs/ember-inspector/pull/1184) ([rwwagner90](https://github.com/rwwagner90))
+- No duplicate imports lint rule [\#1182](https://github.com/emberjs/ember-inspector/pull/1182) ([ansmonjol](https://github.com/ansmonjol))
+- Use brace expansion lint rule [\#1180](https://github.com/emberjs/ember-inspector/pull/1180) ([ansmonjol](https://github.com/ansmonjol))
+- fix: pin artifact-download to v1 [\#1179](https://github.com/emberjs/ember-inspector/pull/1179) ([SYU15](https://github.com/SYU15))
+- attrs does not have constructor [\#1176](https://github.com/emberjs/ember-inspector/pull/1176) ([patricklx](https://github.com/patricklx))
+- Ember 3.17 [\#1174](https://github.com/emberjs/ember-inspector/pull/1174) ([rwwagner90](https://github.com/rwwagner90))
+- \[BUGFIX\] Updates autotracking APIs [\#1170](https://github.com/emberjs/ember-inspector/pull/1170) ([pzuraq](https://github.com/pzuraq))
+- Fix code coverage report [\#1167](https://github.com/emberjs/ember-inspector/pull/1167) ([chancancode](https://github.com/chancancode))
+- Co-locate component templates [\#1166](https://github.com/emberjs/ember-inspector/pull/1166) ([chancancode](https://github.com/chancancode))
+- Introduce `setupTestAdapter` hook [\#1165](https://github.com/emberjs/ember-inspector/pull/1165) ([chancancode](https://github.com/chancancode))
+- \[FEAT\] Add inspect store button to data pane in Ember Inspector [\#1163](https://github.com/emberjs/ember-inspector/pull/1163) ([SYU15](https://github.com/SYU15))
+- Inter Font [\#1161](https://github.com/emberjs/ember-inspector/pull/1161) ([nummi](https://github.com/nummi))
+- Bump acorn from 5.7.3 to 5.7.4 [\#1160](https://github.com/emberjs/ember-inspector/pull/1160) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Base font size and utility classes [\#1157](https://github.com/emberjs/ember-inspector/pull/1157) ([nummi](https://github.com/nummi))
+- Update issue templates [\#1155](https://github.com/emberjs/ember-inspector/pull/1155) ([rwwagner90](https://github.com/rwwagner90))
+- Update to ember 3.16 [\#1151](https://github.com/emberjs/ember-inspector/pull/1151) ([Windvis](https://github.com/Windvis))
+- Bump handlebars from 4.2.1 to 4.5.3 [\#1122](https://github.com/emberjs/ember-inspector/pull/1122) ([dependabot[bot]](https://github.com/apps/dependabot))
+- v3.13.1 CHANGELOG [\#1119](https://github.com/emberjs/ember-inspector/pull/1119) ([chancancode](https://github.com/chancancode))
+- Bump minor on master after 3.13 release [\#1118](https://github.com/emberjs/ember-inspector/pull/1118) ([chancancode](https://github.com/chancancode))
+
+## [v3.13.2](https://github.com/emberjs/ember-inspector/tree/v3.13.2) (2020-02-19)
+
+[Full Changelog](https://github.com/emberjs/ember-inspector/compare/v3.13.1...v3.13.2)
+
+**Fixed bugs:**
+
+- fix recursion of getTagTrackedProps [\#1144](https://github.com/emberjs/ember-inspector/pull/1144) ([patricklx](https://github.com/patricklx))
+- Fix fallback to old inspectors [\#1141](https://github.com/emberjs/ember-inspector/pull/1141) ([wycats](https://github.com/wycats))
+- \[BUGFIX\] Updates "import" paths for autotracking APIs [\#1138](https://github.com/emberjs/ember-inspector/pull/1138) ([pzuraq](https://github.com/pzuraq))
+- only boot inspector on HTML pages [\#1137](https://github.com/emberjs/ember-inspector/pull/1137) ([efx](https://github.com/efx))
+
+**Closed issues:**
+
+- Route Tab not displaying anything - 3.15 [\#1140](https://github.com/emberjs/ember-inspector/issues/1140)
+- injected script breaks browser default XML presentation [\#1136](https://github.com/emberjs/ember-inspector/issues/1136)
+- Investigate canary failures [\#1134](https://github.com/emberjs/ember-inspector/issues/1134)
+- Error message: Ember.meta\(...\).peekDescriptors is not a function - Object are not shown for any ember component [\#1120](https://github.com/emberjs/ember-inspector/issues/1120)
+
+**Merged pull requests:**
+
+- Bump Ember Table to 2.2.2 [\#1131](https://github.com/emberjs/ember-inspector/pull/1131) ([mixonic](https://github.com/mixonic))
+- Fix canary test failure [\#1130](https://github.com/emberjs/ember-inspector/pull/1130) ([chancancode](https://github.com/chancancode))
+- Bump handlebars from 4.2.1 to 4.5.3 [\#1122](https://github.com/emberjs/ember-inspector/pull/1122) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v3.13.1](https://github.com/emberjs/ember-inspector/tree/v3.13.1) (2019-12-20)
 
 [Full Changelog](https://github.com/emberjs/ember-inspector/compare/v3.13.0...v3.13.1)
@@ -900,6 +1313,3 @@
 * Added a hint to refresh the page when the Inspector is open after a few promises were created and uncaught.
 * [BUGFIX] Error message about file:// protocol should only be shown on Chrome
 * [BUGFIX] Add missing ember.prod.js file in vendors
-
-
-\* *This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)*

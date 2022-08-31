@@ -1,10 +1,18 @@
-{{#if filtered.length}}
-  <div class="list__content js-deprecations" style="height: 100%;">
-    {{#vertical-collection
-      filtered
-      estimateHeight=20
-    as |content|
-    }}
+{{! template-lint-disable no-action}}
+{{#if this.toolbarContainer}}
+  {{#in-element this.toolbarContainer}}
+    <DeprecationsToolbar
+      @changeDeprecationWorkflow={{this.changeDeprecationWorkflow}}
+      @clear={{action this.send "clear"}}
+      @searchValue={{this.searchValue}}
+      @toggleDeprecationWorkflow={{this.toggleDeprecationWorkflow}}
+    />
+  {{/in-element}}
+{{/if}}
+
+{{#if this.filtered.length}}
+  <div class="list__content js-deprecations">
+    {{#vertical-collection this.filtered estimateHeight=20 as |content|}}
       <DeprecationItem
         @model={{content}}
         @openResource={{this.openResource}}
@@ -21,7 +29,8 @@
     </p>
     <button
       class="js-page-refresh-btn"
-      {{action "refreshPage"}}
+      type="button"
+      {{on "click" this.adapter.refreshPage}}
     >
       Reload
     </button>

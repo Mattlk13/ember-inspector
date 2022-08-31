@@ -1,6 +1,8 @@
+/* eslint-disable ember/require-tagless-components */
 import Component from '@ember/component';
+import { action } from '@ember/object';
 import { debounce } from '@ember/runloop';
-import { htmlSafe } from '@ember/string';
+import { htmlSafe } from '@ember/template';
 import { tracked } from '@glimmer/tracking';
 
 export default class ScrollContainerComponent extends Component {
@@ -45,10 +47,11 @@ export default class ScrollContainerComponent extends Component {
   }
 
   get scrollTarget() {
-    return this.element.querySelector('.scroll-target');
+    return this.element?.querySelector('.scroll-target');
   }
 
-  didRender() {
+  @action
+  elementInserted() {
     let { index, lastIndex, currentItem, lastItem } = this;
 
     if (index !== lastIndex || currentItem !== lastItem) {
@@ -59,6 +62,7 @@ export default class ScrollContainerComponent extends Component {
     }
   }
 
+  @action
   scrollIntoViewIfNeeded() {
     let { element, scrollTarget } = this;
 
@@ -66,14 +70,17 @@ export default class ScrollContainerComponent extends Component {
       scrollTarget.scrollIntoView({
         behavior: 'auto',
         block: 'nearest',
-        inline: 'nearest'
+        inline: 'nearest',
       });
     }
   }
 }
 
 function needsScroll(container, target) {
-  let { top: containerTop, bottom: containerBottom } = container.getBoundingClientRect();
+  if (!container || !target) return false;
+
+  let { top: containerTop, bottom: containerBottom } =
+    container.getBoundingClientRect();
   let { top: targetTop, bottom: targetBottom } = target.getBoundingClientRect();
   return targetTop < containerTop || targetBottom > containerBottom;
 }

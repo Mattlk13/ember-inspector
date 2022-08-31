@@ -1,25 +1,24 @@
-import Component from '@ember/component';
-import { computed } from '@ember/object';
-import { htmlSafe } from '@ember/string';
+import { computed, get } from '@ember/object';
+import Component from '@glimmer/component';
+import { htmlSafe } from '@ember/template';
 import checkCurrentRoute from 'ember-inspector/utils/check-current-route';
 
-export default Component.extend({
-  tagName: '',
+export default class RouteCellName extends Component {
+  @computed('args.route.parentCount')
+  get labelStyle() {
+    return htmlSafe(
+      `padding-left: ${+get(this, 'args.route.parentCount') * 20 + 5}px;`
+    );
+  }
 
-  labelStyle: computed('route.parentCount', function() {
-    return htmlSafe(`padding-left: ${+this.get('route.parentCount') * 20 + 5}px;`);
-  }),
+  @computed('args.currentRoute.{name,url}', 'args.route.value.{name,url}')
+  get isCurrent() {
+    const { currentRoute, route } = this.args;
 
-  isCurrent: computed('currentRoute.{name,url}', 'route.value.{name,url}', function() {
-    const {
-      currentRoute,
-      route,
-    } = this;
-
-    if (!currentRoute) {
+    if (!currentRoute || !route) {
       return false;
     }
 
     return checkCurrentRoute(currentRoute, route.value);
-  })
-});
+  }
+}

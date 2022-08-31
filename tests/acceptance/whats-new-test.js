@@ -2,9 +2,12 @@ import { visit, find } from '@ember/test-helpers';
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
 import Pretender from 'pretender';
+import { setupTestAdapter } from '../test-adapter';
 
 function urlFor(ref) {
-  return `https://raw.githubusercontent.com/emberjs/ember-inspector/${encodeURIComponent(ref)}/CHANGELOG.md`;
+  return `https://raw.githubusercontent.com/emberjs/ember-inspector/${encodeURIComponent(
+    ref
+  )}/CHANGELOG.md`;
 }
 
 function generateContent(master = false) {
@@ -22,13 +25,21 @@ function generateContent(master = false) {
   }
 
   content.push(`
-## [v3.3.0](https://github.com/emberjs/ember-inspector/tree/v3.3.0) (2018-08-02)
+## v4.5.3 (2021-11-18)
 
 [Full Changelog](https://emberjs.com)
 
 **Implemented enhancements:**
 
 - Stuff
+
+## v4.5.2 (2021-11-17)
+
+[Full Changelog](https://emberjs.com)
+
+**Implemented enhancements:**
+
+- Other Stuff
 
 ## [v3.2.0](https://github.com/emberjs/ember-inspector/tree/v3.2.0) (2018-07-03)
 
@@ -41,15 +52,16 @@ function generateContent(master = false) {
   return content.join('\n');
 }
 
-module('Whats New', function(outer) {
+module('Whats New', function (outer) {
+  setupTestAdapter(outer);
   setupApplicationTest(outer);
 
-  outer.beforeEach(function() {
-    this.config = this.owner.lookup('config:main');
+  outer.beforeEach(function () {
+    this.config = this.owner.lookup('service:config');
     this.originalVersion = this.config.version;
   });
 
-  outer.afterEach(function() {
+  outer.afterEach(function () {
     this.config.version = this.originalVersion;
 
     if (this.server) {
@@ -57,67 +69,83 @@ module('Whats New', function(outer) {
     }
   });
 
-  module('Released version', function(inner) {
-    inner.beforeEach(function() {
-      this.config.version = '3.3.0';
+  module('Released version', function (inner) {
+    inner.beforeEach(function () {
+      this.config.version = '4.5.3';
     });
 
-    test('Changelog is parsed and displayed', async function(assert) {
+    test('Changelog is parsed and displayed', async function (assert) {
       this.server = new Pretender(function () {
-        this.get(urlFor('v3.3.0'), () => [200, { 'Content-Type': 'text/plain' }, generateContent()]);
+        this.get(urlFor('v4.5.3'), () => [
+          200,
+          { 'Content-Type': 'text/plain' },
+          generateContent(),
+        ]);
       });
 
       await visit('/info/whats-new');
 
-      assert.dom('.whats-new h2').exists({ count: 1 }, 'correct section of markdown is rendered');
+      assert
+        .dom('.whats-new h2')
+        .exists({ count: 1 }, 'correct section of markdown is rendered');
 
-      assert.equal(
-        find('.whats-new h2 a').text,
-        'v3.3.0',
+      assert.strictEqual(
+        find('.whats-new h2').textContent,
+        'v4.5.3 (2021-11-18)',
         'correct section of markdown is rendered'
       );
     });
 
-    test('Error message is displayed on request failure', async function(assert) {
+    test('Error message is displayed on request failure', async function (assert) {
       this.server = new Pretender(function () {
-        this.get(urlFor('v3.3.0'), () => [404, {}, '']);
+        this.get(urlFor('v4.5.3'), () => [404, {}, '']);
       });
 
       await visit('/info/whats-new');
 
-      assert.dom('.whats-new p').exists({ count: 1 }, 'Changelog could not be loaded');
+      assert
+        .dom('.whats-new p')
+        .exists({ count: 1 }, 'Changelog could not be loaded');
     });
   });
 
-  module('Nightly version', function(inner) {
-    inner.beforeEach(function() {
+  module('Nightly version', function (inner) {
+    inner.beforeEach(function () {
       this.config.version = '3.4.0-alpha.1';
     });
 
-    test('Changelog is parsed and displayed', async function(assert) {
+    test('Changelog is parsed and displayed', async function (assert) {
       this.server = new Pretender(function () {
-        this.get(urlFor('master'), () => [200, { 'Content-Type': 'text/plain' }, generateContent(true)]);
+        this.get(urlFor('master'), () => [
+          200,
+          { 'Content-Type': 'text/plain' },
+          generateContent(true),
+        ]);
       });
 
       await visit('/info/whats-new');
 
-      assert.dom('.whats-new h2').exists({ count: 1 }, 'correct section of markdown is rendered');
+      assert
+        .dom('.whats-new h2')
+        .exists({ count: 1 }, 'correct section of markdown is rendered');
 
-      assert.equal(
+      assert.strictEqual(
         find('.whats-new h2 a').text,
         'Unreleased',
         'correct section of markdown is rendered'
       );
     });
 
-    test('Error message is displayed on request failure', async function(assert) {
+    test('Error message is displayed on request failure', async function (assert) {
       this.server = new Pretender(function () {
         this.get(urlFor('master'), () => [404, {}, '']);
       });
 
       await visit('/info/whats-new');
 
-      assert.dom('.whats-new p').exists({ count: 1 }, 'Changelog could not be loaded');
+      assert
+        .dom('.whats-new p')
+        .exists({ count: 1 }, 'Changelog could not be loaded');
     });
   });
 });
